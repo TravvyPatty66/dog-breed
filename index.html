@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dog Breed Quiz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      margin: 1rem;
+    }
+
+    img {
+      width: 250px;
+      height: 250px;
+      object-fit: cover;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .score {
+      font-size: 2rem;
+      text-align: center;
+      margin: 1rem;
+    }
+
+    button {
+      font-size: 1.5rem;
+      padding: 1rem 2rem;
+      border-radius: 5px;
+      background-color: #008CBA;
+      color: #FFF;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #005A6E;
+    }
+  </style>
+</head>
+<body>
+  <h1>Dog Breed Quiz</h1>
+  <button id="show-dogs">Show Dogs</button>
+  <div class="container"></div>
+  <div class="score"></div>
+  <script>
+    const container = document.querySelector('.container');
+    const button = document.querySelector('#show-dogs');
+    const scoreDisplay = document.querySelector('.score');
+    let score = 0;
+    let questionNumber = 0;
+    const numberOfQuestions = 5;
+
+    function fetchDogImages() {
+      container.innerHTML = ''; // clear the container
+      fetch('https://dog.ceo/api/breeds/image/random/4')
+        .then(response => response.json())
+        .then(data => {
+          data.message.forEach(imageUrl => {
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.alt = 'A random dog breed';
+            container.appendChild(img);
+            img.addEventListener('click', () => checkBreed(imageUrl));
+          });
+        });
+    }
+
+    function checkBreed(imageUrl) {
+      const breed = prompt('What is the breed of this dog?');
+      const breedName = getBreedName(imageUrl);
+      if (breed.toLowerCase() === breedName.toLowerCase()) {
+        alert('Correct!');
+        score++;
+      } else {
+        alert(`Sorry, the correct answer was ${breedName}.`);
+      }
+      questionNumber++;
+      if (questionNumber < numberOfQuestions) {
+        fetchDogImages();
+      } else {
+        button.disabled = false;
+        scoreDisplay.textContent = `Final score: ${score} out of ${numberOfQuestions}`;
+        score = 0;
+        questionNumber = 0;
+      }
